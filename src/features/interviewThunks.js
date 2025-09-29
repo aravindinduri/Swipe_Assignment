@@ -116,13 +116,14 @@ const finalizeInterview = createAsyncThunk(
 export const processResumeAndVerify = createAsyncThunk(
   'interview/processResumeAndVerify',
   async ({ file, onProgress }, { dispatch }) => {
+    // Steps 1 & 2: Parse file and verify with AI (no changes here)
     const parseResult = await fileParser.parse(file, onProgress);
     if (!parseResult.success) {
       toast.error(parseResult.error);
       return;
     }
 
-    const { name, email, phone, context } = parseResult;
+    const { name, email, phone, context, fullText } = parseResult;
     toast.info("Verifying profile details with AI...");
     const verificationResponse = await geminiService.verifyProfile(context, { name, email, phone });
 
@@ -136,25 +137,36 @@ export const processResumeAndVerify = createAsyncThunk(
       email: verificationResponse.email === 'MISSING' ? null : verificationResponse.email,
       phone: verificationResponse.phone === 'MISSING' ? null : verificationResponse.phone,
     };
+
+    // --- THE FIX IS HERE ---
+
+    // 1. Determine if info is missing FIRST.
+    const infoIsMissing = !finalProfile.name || !finalProfile.email || !finalProfile.phone;
+
+    // 2. Create the candidate with the CORRECT status from the start.
     const newCandidateId = uuidv4();
     const newCandidate = {
       id: newCandidateId,
       profile: finalProfile,
-      interviewStatus: 'pending_info',
+      resumeContent: fullText, // Save the full text
+      // Set the permanent status based on whether info is missing.
+      interviewStatus: infoIsMissing ? 'pending_info' : 'in_progress',
       chatHistory: [],
       interviewData: [],
       finalScore: 0,
       summary: '',
     };
+    
+    // 3. Dispatch the fully correct candidate object.
     dispatch(addCandidate({ candidate: newCandidate }));
 
-    const infoIsMissing = !finalProfile.name || !finalProfile.email || !finalProfile.phone;
-
+    // 4. Start the live session with the corresponding status.
     dispatch(startSession({
       candidateId: newCandidateId,
       initialStatus: infoIsMissing ? 'collecting_info' : 'in_progress'
     }));
 
+    // 5. Show a warning only if necessary.
     if (infoIsMissing) {
       toast.warning("Some required details were missing. Please provide them to start.");
     }

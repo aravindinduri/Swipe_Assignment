@@ -25,10 +25,6 @@ function App() {
     }
     
     gatekeeperEffectRan.current = true;
-    console.log("Gatekeeper Check:");
-    console.log("Active Candidate ID:", session.activeCandidateId);
-    console.log("Candidate Object:", candidate);
-    console.log("Candidate Interview Status:", candidate?.interviewStatus);
 
     if (session.activeCandidateId && candidate?.interviewStatus === 'in_progress') {
       console.log("CONDITION MET: Locking session for Welcome Back modal.");

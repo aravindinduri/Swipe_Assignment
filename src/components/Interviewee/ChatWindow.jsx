@@ -4,10 +4,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, Mic, MicOff } from 'lucide-react';
 import Timer from '../common/Timer';
-import { handleUserSubmission } from '../../features/interviewThunks'; // Import the thunk
+import { handleUserSubmission } from '../../features/interviewThunks';
 import { tickTimer } from '../../features/sessionSlice';
+import useSpeechRecognition from '../../hooks/useSpeechRecognition';
 
 const ChatWindow = () => {
   const dispatch = useDispatch();
@@ -17,7 +18,6 @@ const ChatWindow = () => {
   const session = useSelector(state => state.session);
   const candidate = useSelector(state => state.candidates.list.find(c => c.id === session.activeCandidateId));
 
-  // Auto-scroll to bottom
   useEffect(() => {
     const viewport = scrollAreaRef.current?.querySelector('div[data-radix-scroll-area-viewport]');
     if (viewport) {
@@ -25,34 +25,55 @@ const ChatWindow = () => {
     }
   }, [candidate?.chatHistory]);
 
-  // CORE TIMER LOGIC
   useEffect(() => {
     if (session.timerIsActive) {
       const interval = setInterval(() => {
         dispatch(tickTimer());
       }, 1000);
 
-      // Auto-submit when timer hits zero
       if (session.timerValue <= 0) {
         clearInterval(interval);
-        dispatch(handleUserSubmission(currentAnswer || "")); // Submit current text or empty
+        dispatch(handleUserSubmission(currentAnswer || ""));
         setCurrentAnswer('');
       }
 
-      // Cleanup function to clear interval when component unmounts or timer stops
       return () => clearInterval(interval);
     }
   }, [session.timerIsActive, session.timerValue, dispatch, currentAnswer]);
 
 
   const handleSubmit = () => {
-    // Only allow submission when awaiting an answer
-    if (session.status !== 'awaiting_answer') return;
+    if (session.status !== 'awaiting_answer' || !currentAnswer.trim()) return;
     dispatch(handleUserSubmission(currentAnswer));
     setCurrentAnswer('');
+    if (isListening) {
+      stopListening();
+    }
   };
-  
+  const {
+    isListening,
+    transcript,
+    isSupported,
+    startListening,
+    stopListening,
+  } = useSpeechRecognition();
+
+  useEffect(() => {
+    if (transcript) {
+      setCurrentAnswer(transcript);
+    }
+  }, [transcript]);
+  const handleMicClick = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
   const isInputDisabled = session.status !== 'awaiting_answer';
+
+
 
   return (
     <Card className="w-full h-[70vh] flex flex-col">
@@ -71,8 +92,8 @@ const ChatWindow = () => {
           ))}
           {(session.status === 'generating_question' || session.status === 'evaluating_answer') && (
             <div className="flex items-center space-x-2 text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>AI is thinking...</span>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>AI is thinking...</span>
             </div>
           )}
         </ScrollArea>
@@ -82,12 +103,23 @@ const ChatWindow = () => {
           <Input
             value={currentAnswer}
             onChange={(e) => setCurrentAnswer(e.target.value)}
-            placeholder="Type your answer here..."
+            placeholder={isListening ? "Listening..." : "Type or say your answer..."}
             disabled={isInputDisabled}
             onKeyPress={(e) => e.key === 'Enter' && !isInputDisabled && handleSubmit()}
           />
-          <Button onClick={handleSubmit} disabled={isInputDisabled}>
-            <Send className="h-4 w-4"/>
+          {isSupported && (
+            <Button
+              variant={isListening ? "destructive" : "outline"}
+              size="icon"
+              onClick={handleMicClick}
+              disabled={isInputDisabled}
+              type="button"
+            >
+              {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </Button>
+          )}
+          <Button onClick={handleSubmit} disabled={isInputDisabled || !currentAnswer.trim()}>
+            <Send className="h-4 w-4" />
           </Button>
         </div>
       </CardFooter>
