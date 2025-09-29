@@ -37,7 +37,7 @@ export const geminiService = {
       Please review the Context and confirm the most accurate and single value for the Name, Email, and Phone number.
       If a value is incorrect or missing in the Extracted Data, find it in the Context and provide the correct one.
       If a field is genuinely not present in the Context, return 'MISSING' for that field.
-
+      Check if name looks like a real name only add to the name field if it does. don't add if it looks like a random string of characters or a Company name or a Object name it should be person name.
       Return your response ONLY in a valid JSON format with the keys "name", "email", and "phone".
       Example:
       {

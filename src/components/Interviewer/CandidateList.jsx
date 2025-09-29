@@ -244,7 +244,6 @@ const CandidateList = () => {
                   </div>
                 </div>
 
-                {/* Mobile View */}
                 <div className="lg:hidden divide-y divide-zinc-700">
                   {candidates.map((candidate, index) => (
                     <div key={candidate.id} className="p-4 hover:bg-zinc-800/40 rounded-lg mb-2 transition-colors">

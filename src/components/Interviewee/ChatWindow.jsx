@@ -11,6 +11,8 @@ import { tickTimer } from '../../features/sessionSlice';
 import useSpeechRecognition from '../../hooks/useSpeechRecognition';
 import { Badge } from "@/components/ui/badge";
 import { Loader2 } from 'lucide-react';
+import TextareaAutosize from 'react-textarea-autosize';
+
 const ChatWindow = () => {
   const dispatch = useDispatch();
   const [currentAnswer, setCurrentAnswer] = useState('');
@@ -143,14 +145,22 @@ const ChatWindow = () => {
         {!isInterviewComplete && session.status === 'awaiting_answer' && (
           <CardFooter className="border-t border-zinc-700 flex flex-col gap-3">
             <div className="flex items-center gap-3 w-full">
-              <Input
-                value={currentAnswer}
-                onChange={(e) => setCurrentAnswer(e.target.value)}
-                placeholder={isListening ? "Listening..." : "Type your answer here..."}
-                disabled={isInputDisabled}
-                onKeyPress={(e) => e.key === 'Enter' && !isInputDisabled && handleSubmit()}
-                className="flex-1 py-4 text-white bg-zinc-800/50 border-zinc-600 focus:border-emerald-400 rounded-lg w-full"
-              />
+            <TextareaAutosize
+  value={currentAnswer}
+  onChange={(e) => setCurrentAnswer(e.target.value)}
+  placeholder={isListening ? "Listening..." : "Type your answer here..."}
+  disabled={isInputDisabled}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !isInputDisabled) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  }}
+  minRows={1}
+  maxRows={6}
+  className="flex-1 resize-none py-3 px-4 text-white bg-zinc-800/50 border border-zinc-600 
+             focus:border-emerald-400 rounded-lg w-full leading-relaxed"
+/>
               {isSupported && (
                 <Button
                   variant={isListening ? "destructive" : "outline"}
