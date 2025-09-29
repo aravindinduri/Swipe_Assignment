@@ -9,7 +9,6 @@ const candidatesSlice = createSlice({
   initialState,
   reducers: {
     addCandidate: (state, action) => {
-      console.log('jjj')
       state.list.push(action.payload.candidate);
     },
     // addCandidate: (state, action) => {
@@ -78,6 +77,7 @@ const candidatesSlice = createSlice({
       }
     },
   },
+  
 });
 
 export const {

@@ -149,7 +149,7 @@ export const processResumeAndVerify = createAsyncThunk(
     dispatch(addCandidate({ candidate: newCandidate }));
 
     const infoIsMissing = !finalProfile.name || !finalProfile.email || !finalProfile.phone;
-    console.log(infoIsMissing)
+
     dispatch(startSession({
       candidateId: newCandidateId,
       initialStatus: infoIsMissing ? 'collecting_info' : 'in_progress'
