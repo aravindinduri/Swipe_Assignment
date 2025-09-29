@@ -1,62 +1,85 @@
 import { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
 import IntervieweeView from './pages/IntervieweeView';
 import InterviewerView from './pages/InterviewerView';
 import { Toaster } from "@/components/ui/sonner";
 import WelcomeBackModal from "./components/common/WelcomeBackModal";
 import { setSessionReady } from './features/sessionSlice';
+import { Mic, Eye, Workflow } from 'lucide-react';
 
 function App() {
   const dispatch = useDispatch();
   const session = useSelector(state => state.session);
-  const candidate = useSelector(state => 
+  const candidate = useSelector(state =>
     state.candidates.list.find(c => c.id === session.activeCandidateId)
   );
 
- 
   const gatekeeperEffectRan = useRef(false);
-
   useEffect(() => {
     if (gatekeeperEffectRan.current === true) return;
-
     if (session.activeCandidateId && candidate?.interviewStatus === 'in_progress') {
       dispatch(setSessionReady(false));
     }
-    
     gatekeeperEffectRan.current = true;
-
-    if (session.activeCandidateId && candidate?.interviewStatus === 'in_progress') {
-      console.log("CONDITION MET: Locking session for Welcome Back modal.");
-      dispatch(setSessionReady(false));
-    } else {
-      console.log("CONDITION NOT MET: Proceeding directly.");
-    }
-  }, [dispatch, session.activeCandidateId, candidate]); 
-
+  }, [dispatch, session.activeCandidateId, candidate]);
 
   return (
-    <div className="container mx-auto min-h-screen flex flex-col items-center p-4 md:p-8">
-      <header className="mb-6 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Crisp AI Interview</h1>
-        <p className="text-muted-foreground">Your AI-Powered Interview Assistant</p>
-      </header>
-      
-      <Tabs defaultValue="interviewee" className="w-full max-w-4xl">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="interviewee">Interviewee</TabsTrigger>
-          <TabsTrigger value="interviewer">Interviewer</TabsTrigger>
-        </TabsList>
-        <TabsContent value="interviewee">
-          <IntervieweeView />
-        </TabsContent>
-        <TabsContent value="interviewer">
-          <InterviewerView />
-        </TabsContent>
-      </Tabs>
-      
-      <Toaster richColors />
+    <div className="min-h-screen w-full bg-zinc-900 text-white flex flex-col">
+      <div className="border-b border-zinc-800 bg-black/40 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-emerald-500 rounded flex items-center justify-center">
+              <Workflow className="h-5 w-5 text-black" fill="currentColor" />
+            </div>
+            <span className="text-xl font-semibold tracking-tight">Crisp</span>
+          </div>
+          <div className="text-sm text-zinc-500">AI Interview Platform</div>
+        </div>
+      </div>
 
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12">
+        <Card className="w-full bg-zinc-800/50 border-zinc-700 shadow-xl backdrop-blur">
+          <CardContent className="p-8">
+            <Tabs defaultValue="interviewee" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 bg-zinc-900 border border-zinc-700 p-1 mb-8">
+                <TabsTrigger
+                  value="interviewee"
+                  className="flex items-center gap-2 text-zinc-400 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-zinc-600 rounded"
+                >
+                  <Mic className="h-4 w-4" />
+                  Interview
+                </TabsTrigger>
+                <TabsTrigger
+                  value="interviewer"
+                  className="flex items-center gap-2 text-zinc-400 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-zinc-600 rounded"
+                >
+                  <Eye className="h-4 w-4" />
+                  Review
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="interviewee" className="mt-0">
+                <IntervieweeView />
+              </TabsContent>
+              <TabsContent value="interviewer" className="mt-0">
+                <InterviewerView />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </main>
+
+      <div className="border-t border-zinc-800 mt-auto">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between text-sm text-zinc-500">
+            <span>&copy; {new Date().getFullYear()} Crisp</span>
+          </div>
+        </div>
+      </div>
+
+      <Toaster richColors position="top-right" />
       <WelcomeBackModal />
     </div>
   );

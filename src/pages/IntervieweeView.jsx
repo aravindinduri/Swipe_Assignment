@@ -15,9 +15,7 @@ const IntervieweeView = () => {
     state.candidates.list.find((c) => c.id === activeCandidateId)
   );
 
-
   useEffect(() => {
-
     if (sessionStatus === 'in_progress') {
       dispatch(fetchNextQuestion());
     }
@@ -25,49 +23,71 @@ const IntervieweeView = () => {
 
   if (!isSessionReady) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="flex items-center justify-center h-screen bg-zinc-900">
+        <Loader2 className="h-12 w-12 animate-spin text-emerald-400" />
       </div>
     );
   }
 
+  const wrapperClasses = "flex justify-center items-center p-4 bg-zinc-900 min-h-screen";
+
   switch (sessionStatus) {
     case 'idle':
-      return <ResumeUpload />;
+      return (
+        <div className={wrapperClasses}>
+          <ResumeUpload />
+        </div>
+      );
 
     case 'collecting_info':
-      return <MissingInfoForm />;
+      return (
+        <div className={wrapperClasses}>
+          <MissingInfoForm />
+        </div>
+      );
 
     case 'in_progress':
     case 'generating_question':
     case 'awaiting_answer':
     case 'evaluating_answer':
     case 'generating_summary':
-      return <ChatWindow />;
+      return (
+        <div className={wrapperClasses}>
+          <ChatWindow />
+        </div>
+      );
 
     case 'finished':
       return (
-        <Card className="w-full text-center">
-          <CardHeader>
-            <CardTitle>Interview Complete!</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center gap-4 pt-6">
-            <CheckCircle className="h-16 w-16 text-green-500" />
-            <p className="text-xl">Thank you for completing the interview.</p>
-            <p className="text-muted-foreground">
-              You can now close this tab. The interviewer has received your results.
-            </p>
-            {candidate?.finalScore != null && (
-              <p className="font-bold text-2xl pt-4">
-                Final Score: {candidate.finalScore.toFixed(1)} / 10
+        <div className={wrapperClasses}>
+          <Card className="w-full max-w-md rounded-xl shadow-lg bg-zinc-800/60 border border-zinc-700">
+            <CardHeader className="pb-1">
+              <CardTitle className="text-2xl text-white font-semibold">Interview Complete!</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center gap-2 pt-2">
+              <CheckCircle className="h-16 w-16 text-emerald-400" />
+              <p className="text-lg text-white font-medium text-center">
+                Thank you for completing the interview.
               </p>
-            )}
-          </CardContent>
-        </Card>
+              <p className="text-zinc-400 text-center text-sm">
+                You can now close this tab. The interviewer has received your results.
+              </p>
+              {candidate?.finalScore != null && (
+                <p className="font-bold text-xl text-emerald-400 pt-1">
+                  Final Score: {candidate.finalScore.toFixed(1)} / 10
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       );
 
     default:
-      return <ResumeUpload />;
+      return (
+        <div className={wrapperClasses}>
+          <ResumeUpload />
+        </div>
+      );
   }
 };
 
