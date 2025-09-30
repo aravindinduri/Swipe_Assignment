@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowRightCircle, Mic, MicOff, CheckCircle2 } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
@@ -21,12 +20,11 @@ const ChatWindow = () => {
 
   const session = useSelector(state => state.session);
   const candidate = useSelector(state => state.candidates.list.find(c => c.id === session.activeCandidateId));
-
   const allQuestions = candidate?.chatHistory?.filter(msg => msg.author !== 'user') || [];
   const userAnswers = candidate?.chatHistory?.filter(msg => msg.author === 'user') || [];
-  
-  const currentQuestionIndex = allQuestions.findIndex((_, index) => !answeredQuestions.has(index));
-  const currentQuestion = allQuestions[currentQuestionIndex];
+
+  const currentQuestionIndex = session?.currentQuestionIndex || 0;
+  const currentQuestion = session.currentQuestion.text ? session.currentQuestion : allQuestions[currentQuestionIndex] || null;
   const totalQuestions = 6;
 
   useEffect(() => {
@@ -72,8 +70,7 @@ const ChatWindow = () => {
   return (
     <div className="flex justify-center items-center min-h-[70vh] bg-zinc-900/50 p-4">
       <Card className="w-full max-w-4xl bg-zinc-800/60 border border-zinc-700 rounded-xl shadow-lg flex flex-col">
-        
-        {/* Header */}
+
         <CardHeader className="pb-2">
           <CardTitle className="text-2xl text-white font-semibold">Technical Interview</CardTitle>
           <div className="flex items-center gap-3 mt-1">
@@ -86,10 +83,9 @@ const ChatWindow = () => {
           </div>
         </CardHeader>
 
-        {/* Chat Content */}
         <CardContent className="flex-grow overflow-hidden">
           <ScrollArea ref={scrollAreaRef} className="h-full pr-2">
-            
+
             {isInterviewComplete ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-pulse">
@@ -108,7 +104,7 @@ const ChatWindow = () => {
                     <div>
                       <span className="text-white font-medium">Question {currentQuestionIndex + 1}</span>
                       <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="secondary" className="text-xs">{currentQuestion.difficulty || 'Medium'}</Badge>
+                        <Badge variant="secondary" className="text-xs">{currentQuestion?.difficulty}</Badge>
                         <Badge variant="outline" className="text-xs text-zinc-400">
                           Time: {Math.floor(session.timerValue / 60)}:{(session.timerValue % 60).toString().padStart(2, '0')}
                         </Badge>
@@ -118,13 +114,12 @@ const ChatWindow = () => {
                 </div>
 
                 <p className="text-zinc-100 text-lg leading-relaxed whitespace-pre-wrap font-medium mb-4">
-                  {currentQuestion.content}
+                  {currentQuestion.text}
                 </p>
 
-                {/* Timer Progress Bar */}
-                <Progress 
-                  value={timeProgress} 
-                  className={`h-2 rounded-lg ${timeProgress <= 20 ? 'bg-red-500/30' : 'bg-emerald-500/30'}`} 
+                <Progress
+                  value={timeProgress}
+                  className={`h-2 rounded-lg ${timeProgress <= 20 ? 'bg-red-500/30' : 'bg-emerald-500/30'}`}
                 />
               </div>
             ) : (
@@ -145,22 +140,22 @@ const ChatWindow = () => {
         {!isInterviewComplete && session.status === 'awaiting_answer' && (
           <CardFooter className="border-t border-zinc-700 flex flex-col gap-3">
             <div className="flex items-center gap-3 w-full">
-            <TextareaAutosize
-  value={currentAnswer}
-  onChange={(e) => setCurrentAnswer(e.target.value)}
-  placeholder={isListening ? "Listening..." : "Type your answer here..."}
-  disabled={isInputDisabled}
-  onKeyDown={(e) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isInputDisabled) {
-      e.preventDefault();
-      handleSubmit();
-    }
-  }}
-  minRows={1}
-  maxRows={6}
-  className="flex-1 resize-none py-3 px-4 text-white bg-zinc-800/50 border border-zinc-600 
+              <TextareaAutosize
+                value={currentAnswer}
+                onChange={(e) => setCurrentAnswer(e.target.value)}
+                placeholder={isListening ? "Listening..." : "Type your answer here..."}
+                disabled={isInputDisabled}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey && !isInputDisabled) {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
+                minRows={1}
+                maxRows={6}
+                className="flex-1 resize-none py-3 px-4 text-white bg-zinc-800/50 border border-zinc-600 
              focus:border-emerald-400 rounded-lg w-full leading-relaxed"
-/>
+              />
               {isSupported && (
                 <Button
                   variant={isListening ? "destructive" : "outline"}

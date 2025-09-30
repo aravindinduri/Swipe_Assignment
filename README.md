@@ -2,7 +2,8 @@
 # Swipe Internship Assignment: Crisp — The AI-Powered Interview Assistant
 
 - **Live Demo:** [Live](https://swipe-assignment-iota.vercel.app/)
-- **Demo Video:** [Link to your 2-5 minute demo video]
+- **Demo Video:** [Demo](https://jumpshare.com/share/njA2TEton9wAfm8G8z5X)
+- **Portfolio:** [Link](https://aravind-induri.vercel.app/)
 
 ## ✅ Features Checklist
 
@@ -44,7 +45,7 @@ This project successfully implements all the core requirements outlined in the a
 Follow these steps to get the project running on your local machine.
 
 ### **Prerequisites**
--   Node.js (v16 or later recommended)
+-   Node.js (v20 or later recommended)
 -   npm or yarn
 
 ### **Installation Guide**

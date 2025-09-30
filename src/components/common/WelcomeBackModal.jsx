@@ -1,4 +1,3 @@
-import React from 'react'; // No longer need useState or useEffect
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Dialog,

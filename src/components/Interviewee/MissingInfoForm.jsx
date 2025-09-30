@@ -27,7 +27,7 @@ const MissingInfoForm = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         dispatch(updateCandidateProfile({ candidateId: activeCandidateId, profile: formData }));
-        dispatch(setSessionStatus('generating_question')); // Start the interview
+        dispatch(setSessionStatus('in_progress'));
     };
 
     return (

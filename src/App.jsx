@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import WelcomeBackModal from "./components/common/WelcomeBackModal";
 import { setSessionReady } from './features/sessionSlice';
 import { Mic, Eye, Workflow } from 'lucide-react';
-
+import { toast } from 'sonner';
 function App() {
   const dispatch = useDispatch();
   const session = useSelector(state => state.session);
@@ -16,14 +16,29 @@ function App() {
     state.candidates.list.find(c => c.id === session.activeCandidateId)
   );
 
+  const [activeTab, setActiveTab] = useState("interviewee");
+
   const gatekeeperEffectRan = useRef(false);
   useEffect(() => {
     if (gatekeeperEffectRan.current === true) return;
-    if (session.activeCandidateId && candidate?.interviewStatus === 'in_progress') {
+    if (session.activeCandidateId && (candidate?.interviewStatus === 'in_progress' ||
+    candidate?.interviewStatus === 'collecting_info'
+    )) {
       dispatch(setSessionReady(false));
     }
     gatekeeperEffectRan.current = true;
   }, [dispatch, session.activeCandidateId, candidate]);
+
+  const handleTabChange = (value) => {
+    if (
+      candidate?.interviewStatus === "in_progress" &&
+      value === "interviewer"
+    ) {
+      toast.warning("You can review after the interview is complete.");
+      return; 
+    }
+    setActiveTab(value);
+  };
 
   return (
     <div className="min-h-screen w-full bg-zinc-900 text-white flex flex-col">
@@ -42,7 +57,7 @@ function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12">
         <Card className="w-full bg-zinc-800/50 border-zinc-700 shadow-xl backdrop-blur">
           <CardContent className="p-8">
-            <Tabs defaultValue="interviewee" className="w-full">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
               <TabsList className="grid w-full grid-cols-2 bg-zinc-900 border border-zinc-700 p-1 mb-8">
                 <TabsTrigger
                   value="interviewee"

@@ -138,37 +138,33 @@ export const processResumeAndVerify = createAsyncThunk(
       phone: verificationResponse.phone === 'MISSING' ? null : verificationResponse.phone,
     };
 
-    // --- THE FIX IS HERE ---
-
-    // 1. Determine if info is missing FIRST.
     const infoIsMissing = !finalProfile.name || !finalProfile.email || !finalProfile.phone;
 
-    // 2. Create the candidate with the CORRECT status from the start.
     const newCandidateId = uuidv4();
     const newCandidate = {
       id: newCandidateId,
       profile: finalProfile,
-      resumeContent: fullText, // Save the full text
-      // Set the permanent status based on whether info is missing.
-      interviewStatus: infoIsMissing ? 'pending_info' : 'in_progress',
+      resumeContent: fullText, 
+      interviewStatus: infoIsMissing ? 'collecting_info' : 'in_progress',
       chatHistory: [],
       interviewData: [],
       finalScore: 0,
       summary: '',
     };
     
-    // 3. Dispatch the fully correct candidate object.
     dispatch(addCandidate({ candidate: newCandidate }));
 
-    // 4. Start the live session with the corresponding status.
     dispatch(startSession({
       candidateId: newCandidateId,
       initialStatus: infoIsMissing ? 'collecting_info' : 'in_progress'
     }));
 
-    // 5. Show a warning only if necessary.
-    if (infoIsMissing) {
-      toast.warning("Some required details were missing. Please provide them to start.");
-    }
+if (infoIsMissing) {
+  toast.warning("Some required details were missing. Please fill them to start.");
+} else {
+  toast.success("Candidate profile verified. Interview started!");
+}
   }
 );
+
+
