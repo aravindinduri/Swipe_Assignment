@@ -68,39 +68,39 @@ const ChatWindow = () => {
   const timeProgress = currentQuestion ? Math.max(0, (session.timerValue / totalTime) * 100) : 0;
 
   return (
-    <div className="flex justify-center items-center min-h-[70vh] bg-zinc-900/50 p-4">
+    <div className="flex justify-center items-center min-h-[80vh] sm:min-h-[70vh] bg-zinc-900/50 p-2 sm:p-4">
       <Card className="w-full max-w-4xl bg-zinc-800/60 border border-zinc-700 rounded-xl shadow-lg flex flex-col">
 
         <CardHeader className="pb-2">
-          <CardTitle className="text-2xl text-white font-semibold">Technical Interview</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl text-white font-semibold">Technical Interview</CardTitle>
           <div className="flex items-center gap-3 mt-1">
             <Badge variant={isInterviewComplete ? "default" : "secondary"}>
               {isInterviewComplete ? 'Completed' : 'In Progress'}
             </Badge>
             <span className="text-sm text-zinc-400">
-              {answeredQuestions.size} of {totalQuestions} answered
+              {answeredQuestions.size + 1} of {totalQuestions} answered
             </span>
           </div>
         </CardHeader>
 
         <CardContent className="flex-grow overflow-hidden">
-          <ScrollArea ref={scrollAreaRef} className="h-full pr-2">
+          <ScrollArea ref={scrollAreaRef} className="h-full pr-2 md:pr-4">
 
             {isInterviewComplete ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-pulse">
-                  <CheckCircle2 className="h-10 w-10 text-green-600" />
+              <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-full flex items-center justify-center mb-4 sm:mb-6 animate-pulse">
+                  <CheckCircle2 className="h-8 w-8 sm:h-10 sm:w-10 text-green-600" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-3 text-white">Interview Complete!</h3>
-                <p className="text-zinc-400 max-w-md text-lg">
+                <h3 className="text-xl sm:text-2xl font-semibold mb-2 sm:mb-3 text-white">Interview Complete!</h3>
+                <p className="text-base sm:text-lg text-zinc-400 max-w-md">
                   Thank you for completing all {totalQuestions} questions. Your responses have been recorded.
                 </p>
               </div>
             ) : currentQuestion ? (
-              <div className="bg-zinc-900/80 border border-zinc-700 rounded-xl p-6 mb-4 shadow-sm">
+              <div className="bg-zinc-900/80 border border-zinc-700 rounded-xl p-4 sm:p-6 mb-4 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">Q</div>
+                    <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">Q</div>
                     <div>
                       <span className="text-white font-medium">Question {currentQuestionIndex + 1}</span>
                       <div className="flex items-center gap-2 mt-1">
@@ -113,7 +113,7 @@ const ChatWindow = () => {
                   </div>
                 </div>
 
-                <p className="text-zinc-100 text-lg leading-relaxed whitespace-pre-wrap font-medium mb-4">
+                <p className="text-base sm:text-lg text-zinc-100 leading-relaxed whitespace-pre-wrap font-medium mb-4">
                   {currentQuestion.text}
                 </p>
 
@@ -123,12 +123,12 @@ const ChatWindow = () => {
                 />
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Loader2 className="h-12 w-12 animate-spin text-emerald-400 mb-4" />
-                <h3 className="text-xl font-semibold mb-2 text-white">
+              <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center">
+                <Loader2 className="h-10 w-10 sm:h-12 sm:w-12 animate-spin text-emerald-400 mb-4" />
+                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-white">
                   {session.status === 'generating_question' ? 'Preparing Your Question' : 'Getting Ready'}
                 </h3>
-                <p className="text-zinc-400 max-w-sm text-lg">
+                <p className="text-base sm:text-lg text-zinc-400 max-w-sm">
                   {session.status === 'generating_question' ? 'AI is crafting your next question...' : 'The interview will begin shortly...'}
                 </p>
               </div>
@@ -138,8 +138,8 @@ const ChatWindow = () => {
         </CardContent>
 
         {!isInterviewComplete && session.status === 'awaiting_answer' && (
-          <CardFooter className="border-t border-zinc-700 flex flex-col gap-3">
-            <div className="flex items-center gap-3 w-full">
+          <CardFooter className="border-t border-zinc-700 p-2 sm:p-4">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full">
               <TextareaAutosize
                 value={currentAnswer}
                 onChange={(e) => setCurrentAnswer(e.target.value)}
@@ -153,27 +153,32 @@ const ChatWindow = () => {
                 }}
                 minRows={1}
                 maxRows={6}
-                className="flex-1 resize-none py-3 px-4 text-white bg-zinc-800/50 border border-zinc-600 
-             focus:border-emerald-400 rounded-lg w-full leading-relaxed"
+                className="flex-1 resize-none w-full py-2 px-3 sm:py-3 sm:px-4 text-white bg-zinc-800/50 border border-zinc-600 focus:border-emerald-400 rounded-lg leading-relaxed"
               />
-              {isSupported && (
+              {/* FIX: This container now correctly handles button layout on mobile and larger screens. */}
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                {isSupported && (
+                  <Button
+                    variant={isListening ? "destructive" : "outline"}
+                    size="icon"
+                    onClick={handleMicClick}
+                    disabled={isInputDisabled}
+                    className="h-10 w-12 flex items-center justify-center flex-shrink-0"
+                  >
+                    <Mic className="h-5 w-5" />
+                  </Button>
+                )}
                 <Button
-                  variant={isListening ? "destructive" : "outline"}
-                  size="icon"
-                  onClick={handleMicClick}
-                  disabled={isInputDisabled}
-                  className="w-14 h-10 flex items-center justify-center"
+                  onClick={handleSubmit}
+                  disabled={isInputDisabled || !currentAnswer.trim()}
+                  // FIX: Added `flex-1` to allow this button to fill remaining space on mobile.
+                  // `sm:flex-none` and `sm:w-auto` resets this behavior for larger screens.
+                  className="flex-1 sm:flex-none sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-4 sm:px-6 rounded-lg flex items-center justify-center gap-2"
                 >
-                  {isListening ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+                  <ArrowRightCircle className="h-5 w-5" />
+                  <span className="hidden sm:inline">Submit</span>
                 </Button>
-              )}
-              <Button
-                onClick={handleSubmit}
-                disabled={isInputDisabled || !currentAnswer.trim()}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white py-4 px-8 rounded-lg flex items-center gap-2"
-              >
-                <ArrowRightCircle className="h-6 w-10" /> Submit
-              </Button>
+              </div>
             </div>
           </CardFooter>
         )}
@@ -183,4 +188,4 @@ const ChatWindow = () => {
   );
 };
 
-export default ChatWindow; 
+export default ChatWindow;

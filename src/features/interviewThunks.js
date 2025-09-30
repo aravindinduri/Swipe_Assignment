@@ -24,7 +24,7 @@ export const fetchNextQuestion = createAsyncThunk(
       if (currentQuestionIndex >= 2 && currentQuestionIndex < 4) difficulty = 'Medium';
       else if (currentQuestionIndex >= 4) difficulty = 'Hard';
 
-      const response = await geminiService.generateQuestion(candidate.resumeContent, difficulty);
+      const response = await geminiService.generateQuestion(candidate.resumeContent,currentQuestionIndex, difficulty);
       if (response.error) throw new Error(response.error);
 
       const { question } = response;

@@ -51,27 +51,106 @@ export const geminiService = {
   },
 
 
-  generateQuestion: async (candidateContext, difficulty) => {
+  generateQuestion: async (candidateContext, index, difficulty) => {
+    // A pre-shuffled, balanced sequence of topics.
+    // This ensures the pattern isn't simply "React, then Node, then React..."
+    // It's deterministic, balanced, but not trivially predictable.
+    const topicSequence = [
+      'React.js',   // index 0
+      'Node.js',    // index 1
+      'Node.js',    // index 2
+      'React.js',   // index 3
+      'Node.js',    // index 4
+      'React.js'    // index 5
+      // Add more pairs and shuffle them if you expect more than 6 questions.
+    ];
+
+    // Use the index to pick from the sequence, looping back if necessary.
+    const technology = topicSequence[index % topicSequence.length];
+
     const prompt = `
-      You are a senior technical interviewer for a "Full Stack (React/Node.js)" position.
-      Your task is to generate one interview question with a difficulty of: ${difficulty}.
+    You are a senior technical interviewer for a "Full Stack (React/Node.js)" position.
 
-      The question must be strictly about React.js or Node.js concepts, principles, or practical applications.
-      DO NOT base the technical content of the question on the candidate's resume context provided below.
-      You can, however, use the candidate's name for a slight personalization if you wish.
+    Your task is to generate one interview question for the pre-selected technology: **${technology}**.
+    The difficulty of the question must be: **${difficulty}**.
+    
+    To ensure variety, you MUST randomly select a different sub-topic from the **${technology} Sub-topics** list below and formulate a question strictly about it.
 
-      Return your response ONLY in a valid JSON format with a single key "question".
-      Do not include any other text, explanation, or markdown formatting.
+    **React.js Sub-topics:**
+    *   Core Concepts (Components, JSX, Props, State)
+    *   Hooks (useState, useEffect, useContext, custom hooks)
+    *   State Management (Redux vs. Context API)
+    *   Performance Optimization (Memoization, Code Splitting, Virtual DOM)
+    *   Advanced Concepts (Higher-Order Components, Render Props, Error Boundaries)
+    
+    **Node.js Sub-topics:**
+    *   Core Concepts (Event Loop, Asynchronous Programming, Event Emitter)
+    *   Modules and Packages (npm, CommonJS vs. ESM)
+    *   API Development (RESTful APIs, Middleware, Error Handling)
+    *   Concurrency and Child Processes (Clustering, Worker Threads)
+    *   Streams and Buffers
+    *   Security (Common vulnerabilities like XSS, CSRF in a Node context)
+    
+    DO NOT base the technical content of the question on the candidate's resume context provided below.
+    You may use the candidate's name for a slight personalization if you wish.
+    
+    Return your response ONLY in a valid JSON format with a single key "question".
+    Do not include any other text, explanation, or markdown formatting.
+    
+    ---
+    Candidate Context (for personalization only):
+    ${candidateContext}
+    ---
+    `;
 
-      Example Response for 'Easy' difficulty:
-      {
-        "question": "Can you explain the difference between a controlled and an uncontrolled component in React?"
-      }
+    return callGemini(prompt);
+  },
+  generateQuestion: async (candidateContext, index, difficulty) => {
+  
+    const topicSequence = [
+      'React.js',   
+      'Node.js',   
+      'Node.js',    
+      'React.js',   
+      'Node.js',   
+      'React.js'   
+    ];
 
-      ---
-      Candidate Context (for personalization only):
-      ${candidateContext}
-      ---
+    const technology = topicSequence[index % topicSequence.length];
+
+    const prompt = `
+    You are a senior technical interviewer for a "Full Stack (React/Node.js)" position.
+
+    Your task is to generate one interview question for the pre-selected technology: **${technology}**.
+    The difficulty of the question must be: **${difficulty}**.
+    
+    To ensure variety, you MUST randomly select a different sub-topic from the **${technology} Sub-topics** list below and formulate a question strictly about it.
+
+    **React.js Sub-topics:**
+    *   Core Concepts (Components, JSX, Props, State)
+    *   Hooks (useState, useEffect, useContext, custom hooks)
+    *   State Management (Redux vs. Context API)
+    *   Performance Optimization (Memoization, Code Splitting, Virtual DOM)
+    *   Advanced Concepts (Higher-Order Components, Render Props, Error Boundaries)
+    
+    **Node.js Sub-topics:**
+    *   Core Concepts (Event Loop, Asynchronous Programming, Event Emitter)
+    *   Modules and Packages (npm, CommonJS vs. ESM)
+    *   API Development (RESTful APIs, Middleware, Error Handling)
+    *   Concurrency and Child Processes (Clustering, Worker Threads)
+    *   Streams and Buffers
+    *   Security (Common vulnerabilities like XSS, CSRF in a Node context)
+    
+    DO NOT base the technical content of the question on the candidate's resume context provided below.
+    You may use the candidate's name for a slight personalization if you wish.
+    
+    Return your response ONLY in a valid JSON format with a single key "question".
+    Do not include any other text, explanation, or markdown formatting.
+    
+    ---
+    Candidate Context (for personalization only):
+    ${candidateContext}
+    ---
     `;
 
     return callGemini(prompt);

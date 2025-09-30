@@ -9,6 +9,7 @@ import WelcomeBackModal from "./components/common/WelcomeBackModal";
 import { setSessionReady } from './features/sessionSlice';
 import { Mic, Eye, Workflow } from 'lucide-react';
 import { toast } from 'sonner';
+
 function App() {
   const dispatch = useDispatch();
   const session = useSelector(state => state.session);
@@ -31,34 +32,42 @@ function App() {
 
   const handleTabChange = (value) => {
     if (
-      candidate?.interviewStatus === "in_progress" &&
+      (candidate?.interviewStatus === "in_progress" ||candidate?.interviewStatus == "collecting_info" ) &&
       value === "interviewer"
     ) {
       toast.warning("You can review after the interview is complete.");
-      return; 
+      return;
     }
     setActiveTab(value);
   };
 
   return (
     <div className="min-h-screen w-full bg-zinc-900 text-white flex flex-col">
-      <div className="border-b border-zinc-800 bg-black/40 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      {/* HEADER SECTION */}
+      <div className="border-b border-zinc-800 bg-black/40 backdrop-blur-sm sticky top-0 z-10">
+        {/* IMPROVEMENT: Responsive horizontal padding (px-4 for mobile, sm:px-6 for larger screens). */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-emerald-500 rounded flex items-center justify-center">
+            <div className="w-8 h-8 bg-emerald-500 rounded flex items-center justify-center flex-shrink-0">
               <Workflow className="h-5 w-5 text-black" fill="currentColor" />
             </div>
-            <span className="text-xl font-semibold tracking-tight">Crisp</span>
+            {/* IMPROVEMENT: Responsive font size for the brand name. */}
+            <span className="text-lg sm:text-xl font-semibold tracking-tight">Crisp</span>
           </div>
-          <div className="text-sm text-zinc-500">AI Interview Platform</div>
+          {/* IMPROVEMENT: Hidden on very small screens to prevent clutter, visible from 'sm' breakpoint up. */}
+          <div className="hidden sm:block text-sm text-zinc-500">AI Interview Platform</div>
         </div>
       </div>
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-12">
+      {/* MAIN CONTENT */}
+      {/* IMPROVEMENT: Responsive padding (less on mobile, more on larger screens). */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:px-6 md:py-12">
         <Card className="w-full bg-zinc-800/50 border-zinc-700 shadow-xl backdrop-blur">
-          <CardContent className="p-8">
+          {/* IMPROVEMENT: Card content padding is significantly reduced on mobile (p-4) and increased on larger screens. */}
+          <CardContent className="p-4 sm:p-6 lg:p-8">
             <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-zinc-900 border border-zinc-700 p-1 mb-8">
+              {/* IMPROVEMENT: Reduced bottom margin on mobile for tighter spacing. */}
+              <TabsList className="grid w-full grid-cols-2 bg-zinc-900 border border-zinc-700 p-1 mb-6 sm:mb-8">
                 <TabsTrigger
                   value="interviewee"
                   className="flex items-center gap-2 text-zinc-400 data-[state=active]:bg-zinc-800 data-[state=active]:text-white data-[state=active]:border data-[state=active]:border-zinc-600 rounded"
@@ -86,9 +95,11 @@ function App() {
         </Card>
       </main>
 
+      {/* FOOTER SECTION */}
       <div className="border-t border-zinc-800 mt-auto">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between text-sm text-zinc-500">
+        {/* IMPROVEMENT: Responsive padding for the footer. */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex items-center justify-center sm:justify-between text-xs sm:text-sm text-zinc-500">
             <span>&copy; {new Date().getFullYear()} Crisp</span>
           </div>
         </div>
