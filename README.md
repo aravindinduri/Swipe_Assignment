@@ -53,7 +53,7 @@ Follow these steps to get the project running on your local machine.
 1.  **Clone the Repository**
     ```sh
     git clone https://github.com/your-username/crisp-ai-interview.git
-    cd crisp-ai-interview
+    cd Swipe_Assignment
     ```
 
 2.  **Install Dependencies**
